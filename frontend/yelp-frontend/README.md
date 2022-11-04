@@ -1,3 +1,3 @@
 # Yelp Clone
 
-A basic yelp clone using React, Express and PostgreSQL and Yelp's datasets.
+A basic yelp clone using React, Express, PostgreSQL and Yelp's datasets.
