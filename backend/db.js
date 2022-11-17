@@ -22,7 +22,7 @@ async function close(){
 
 const pool = new Pool({
         user: 'postgres',
-        host: '127.0.0.1',
+        host: 'localhost',
         database: 'yelp',
         password: 'temp',
         port: 5432,
