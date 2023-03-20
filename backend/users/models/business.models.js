@@ -21,10 +21,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false
         },
-        stars: {
-            type: Sequelize.DOUBLE,
+        rating: {
+            type: Sequelize.BIGINT,
             allowNull: false,
-            defaultValue: 0.0
+            defaultValue: 0
         },
         hours: {
             type: Sequelize.TEXT,
