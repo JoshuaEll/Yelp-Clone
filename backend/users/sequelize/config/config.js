@@ -1,7 +1,12 @@
 module.exports = {
   development: {
-    url: 'postgresql://postgres:admin@localhost:5432/yelp',
+    url: 'postgres://postgres:admin@localhost:5432/yelp',
     dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
   },
   test: {
     url: '127.0.0.1',
@@ -11,4 +16,4 @@ module.exports = {
     url: process.env.DB_URL,
     dialect: 'postgres',
   }
-};
+}
