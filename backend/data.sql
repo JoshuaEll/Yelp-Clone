@@ -15,7 +15,8 @@ CREATE TABLE comments (
     comment VARCHAR(255),
     CONSTRAINT fk_businessID FOREIGN KEY(business_id) REFERENCES business(business_id),
     CONSTRAINT fk_userEmail FOREIGN KEY(user_email) REFERENCES user(user_email)
-)
+);
+
 CREATE TABLE pictures (
     business_id VARCHAR(255) PRIMARY KEY,
     picture_name VARCHAR(255),
