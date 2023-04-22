@@ -1,10 +1,11 @@
-CREATE DATABASE yelp;
+CREATE DATABASE yelp_clone;
 
 CREATE TABLE user (
     user_email VARCHAR(255) PRIMARY KEY,
     hashed_password VARCHAR(255),
     first_name VARCHAR(50),
     last_name VARCHAR(50),
+    is_staff BOOLEAN DEFAULT FALSE,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
