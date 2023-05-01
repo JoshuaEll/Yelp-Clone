@@ -2,16 +2,16 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+  // Further reading:
+  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+  url      = env("DATABASE_URL")
 }
 
 // model Example {
@@ -20,77 +20,118 @@ datasource db {
 //    updatedAt DateTime @updatedAt
 // }
 
+
+// Different roles for website
+enum UserRole {
+  MODERATOR
+  ADMIN
+  BASE_USER
+}
+
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String?  @db.Text
-    access_token      String?  @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String?  @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String          @id @default(cuid())
+  userId            String
+  cUserId           String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?         @db.Text
+  access_token      String?         @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?         @db.Text
+  session_state     String?
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialUser    CredentialUser  @relation(fields: [cUserId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String          @id @default(cuid())
+  sessionToken    String          @unique
+  userId          String
+  cUserId         String
+  expires         DateTime
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialUser  CredentialUser? @relation(fields: [cUserId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    firstName     String?
-    lastName      String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+  id            String     @id @default(cuid())
+  email         String?    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole   @default(BASE_USER)
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  Business      Business[]
+  Picture       Picture[]
+  Review        Review[]
+}
+
+model CredentialUser {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  password  String
+  role      UserRole  @default(BASE_USER)
+  accounts  Account[]
+  sessions  Session[]
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }
 
 model Business {
-    id              String      @id @default(cuid())
-    name            String
-    desciption      String?
-    userId          String
-    rating          
-    createdAt       DateTime    @default(now())
-    updatedAt       DateTime    @updatedAt
-    user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  name       String
+  address    String
+  city       String
+  state      String    @db.VarChar(3)
+  desciption String?
+  userId     String
+  rating     Decimal   @db.Decimal(2, 1)
+  categories String[]   
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Picture    Picture[]
+  Hours      Hours[]
+  Review     Review[]
 }
 
 model Picture {
-    id          String      @id @default(cuid())
-    name        String
-    uploadedAt  DateTime    @default(now())
-    user_id     String
-    businessId String
-    user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  name       String
+  uploadedAt DateTime @default(now())
+  userId     String
+  businessId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }
 
 model Hours {
-    businessId  String
-    hours       String
-    business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)   
+  id         String   @id @default(cuid())
+  businessId String
+  hours      Json
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  businessId  String
+  userId      String
+  reviewText  String
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
